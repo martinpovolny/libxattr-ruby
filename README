@@ -11,3 +11,12 @@ Building RDoc documentation:
 
 Mounting with EA and ACL:
   mount -o remount,acl,user_xattr /
+
+Usage:
+
+    XAttr::set( '/tmp', 'user.ruby', 'rulez')
+    XAttr::list( '/tmp' ) { |attr| p attr }
+    XAttr::get( '/tmp', 'user.ruby'), 'rulez' )
+
+  See t/test.rb for more usage examples.
+
