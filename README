@@ -1,0 +1,13 @@
+XAttr -- Ruby bindings for Extended attributes (EA)
+---------------------------------------------------
+author: martin.povolny@solnet.cz
+
+Building the library:
+  ruby extconf.rb
+  make
+
+Building RDoc documentation:
+  make doc
+
+Mounting with EA and ACL:
+  mount -o remount,acl,user_xattr /
