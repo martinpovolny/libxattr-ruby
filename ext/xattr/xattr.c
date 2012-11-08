@@ -32,11 +32,11 @@ VALUE ruby_xattr_set( int argc, VALUE *argv, VALUE class ) {
   }
         
   if (FIXNUM_P(argv[0])) {
-    ret = fsetxattr( FIX2INT(argv[0]),      RSTRING(argv[1])->ptr, 
-                     RSTRING(argv[2])->ptr, RSTRING(argv[2])->len, flags );
+    ret = fsetxattr( FIX2INT(argv[0]),     RSTRING_PTR(argv[1]), 
+                     RSTRING_PTR(argv[2]), RSTRING_LEN(argv[2]), flags );
   } else {
-    ret = setxattr(  RSTRING(argv[0])->ptr, RSTRING(argv[1])->ptr, 
-                     RSTRING(argv[2])->ptr, RSTRING(argv[2])->len, flags );
+    ret = setxattr(  RSTRING_PTR(argv[0]), RSTRING_PTR(argv[1]), 
+                     RSTRING_PTR(argv[2]), RSTRING_LEN(argv[2]), flags );
   }
   if (0 != ret) {
     rb_sys_fail("[f]setxattr(file,name,val,flags) failed");
@@ -69,8 +69,8 @@ VALUE ruby_xattr_lset( int argc, VALUE *argv, VALUE class ) {
       rb_raise(rb_eArgError, "wrong number of arguments (expect 3 or 4)");
   }
         
-  if (0 != lsetxattr( RSTRING(argv[0])->ptr, RSTRING(argv[1])->ptr, 
-                      RSTRING(argv[2])->ptr, RSTRING(argv[2])->len, flags ) ) {
+  if (0 != lsetxattr( RSTRING_PTR(argv[0]), RSTRING_PTR(argv[1]), 
+                      RSTRING_PTR(argv[2]), RSTRING_LEN(argv[2]), flags ) ) {
     rb_sys_fail("lsetxattr(file,name,val,flags) failed");
   }
   return argv[2];
@@ -91,9 +91,9 @@ VALUE ruby_xattr_get( VALUE class, VALUE file, VALUE name ) {
 
   // ssize_t getxattr (const char *path, const char *name, void *value, size_t size);
   if (FIXNUM_P(file)) {
-    size = fgetxattr( FIX2INT(file),     RSTRING(name)->ptr, NULL, 0 );
+    size = fgetxattr( FIX2INT(file),     RSTRING_PTR(name), NULL, 0 );
   } else {
-    size = getxattr( RSTRING(file)->ptr, RSTRING(name)->ptr, NULL, 0 );
+    size = getxattr( RSTRING_PTR(file), RSTRING_PTR(name), NULL, 0 );
   }
   if (-1 == size) {
     rb_sys_fail("[f]getxattr(file,name,NULL,0) failed");
@@ -101,9 +101,9 @@ VALUE ruby_xattr_get( VALUE class, VALUE file, VALUE name ) {
 
   buff = (char*)malloc(size+1);
   if (FIXNUM_P(file)) {
-    size = fgetxattr( FIX2INT(file),     RSTRING(name)->ptr, buff, size );
+    size = fgetxattr( FIX2INT(file),    RSTRING_PTR(name), buff, size );
   } else {
-    size = getxattr( RSTRING(file)->ptr, RSTRING(name)->ptr, buff, size );
+    size = getxattr( RSTRING_PTR(file), RSTRING_PTR(name), buff, size );
   }
   if (-1 == size) {
     free(buff);
@@ -127,13 +127,13 @@ VALUE ruby_xattr_lget( VALUE class, VALUE file, VALUE name ) {
   char *buff;
   VALUE res;
 
-  size = lgetxattr( RSTRING(file)->ptr, RSTRING(name)->ptr, NULL, 0 );
+  size = lgetxattr( RSTRING_PTR(file), RSTRING_PTR(name), NULL, 0 );
   if (-1 == size) {
     rb_sys_fail("lgetxattr(file,name,NULL,0) failed");
   }
 
   buff = (char*)malloc(size+1);
-  size = lgetxattr( RSTRING(file)->ptr, RSTRING(name)->ptr, buff, size );
+  size = lgetxattr( RSTRING_PTR(file), RSTRING_PTR(name), buff, size );
   if (-1 == size) {
     free(buff);
     rb_sys_fail("lgetxattr(file,name,buff,size) failed");
@@ -161,7 +161,7 @@ VALUE ruby_xattr_list( VALUE class, VALUE file ) {
   if (FIXNUM_P(file)) {
     size = flistxattr( FIX2INT(file),     NULL, 0 );
   } else {
-    size = listxattr( RSTRING(file)->ptr, NULL, 0 );
+    size = listxattr( RSTRING_PTR(file), NULL, 0 );
   }
   if (-1 == size) {
     rb_sys_fail("[f]listxattr(file,NULL,0) failed");
@@ -171,7 +171,7 @@ VALUE ruby_xattr_list( VALUE class, VALUE file ) {
   if (FIXNUM_P(file)) {
     size = flistxattr( FIX2INT(file),     buff, size );
   } else {
-    size = listxattr( RSTRING(file)->ptr, buff, size );
+    size = listxattr( RSTRING_PTR(file), buff, size );
   }
   if (-1 == size) {
     free(buff);
@@ -205,13 +205,13 @@ VALUE ruby_xattr_llist( VALUE class, VALUE file ) {
   char *buff, *ptr;
   VALUE res;
 
-  size = llistxattr( RSTRING(file)->ptr, NULL, 0 );
+  size = llistxattr( RSTRING_PTR(file), NULL, 0 );
   if (-1 == size) {
     rb_sys_fail("llistxattr(file,NULL,0) failed");
   }
   buff = (char*)malloc(size+1);
 
-  size = llistxattr( RSTRING(file)->ptr, buff, size );
+  size = llistxattr( RSTRING_PTR(file), buff, size );
   if (-1 == size) {
     free(buff);
     rb_sys_fail("llistxattr(file,buff,size) failed");
@@ -243,9 +243,9 @@ VALUE ruby_xattr_remove( VALUE class, VALUE file, VALUE name ) {
   int res;
 
   if (FIXNUM_P(file)) {
-    res = fremovexattr( FIX2INT(file),     RSTRING(name)->ptr );
+    res = fremovexattr( FIX2INT(file),    RSTRING_PTR(name) );
   } else {
-    res = removexattr( RSTRING(file)->ptr, RSTRING(name)->ptr );
+    res = removexattr( RSTRING_PTR(file), RSTRING_PTR(name) );
   }
   if (-1 == res) {
     rb_sys_fail("[f]removexattr(file,buff) failed");
@@ -262,7 +262,7 @@ VALUE ruby_xattr_remove( VALUE class, VALUE file, VALUE name ) {
  *
  */
 VALUE ruby_xattr_lremove( VALUE class, VALUE file, VALUE name ) {
-  if (-1 == lremovexattr( RSTRING(file)->ptr, RSTRING(name)->ptr ) ) {
+  if (-1 == lremovexattr( RSTRING_PTR(file), RSTRING_PTR(name) ) ) {
     rb_sys_fail("lremovexattr(file,buff) failed");
   }
   return Qtrue;

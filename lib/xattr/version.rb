@@ -1,3 +1,3 @@
-module XAttr
+class XAttr
   VERSION=0.1
 end

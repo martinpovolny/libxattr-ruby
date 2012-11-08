@@ -11,11 +11,11 @@ class XAttrTest < Test::Unit::TestCase
     XAttr::lset( TEST_PATH, 'user.foo', 'bar' )
 
     attr = nil
-    XAttr::list(TEST_PATH) { |attr| }
+    XAttr::list(TEST_PATH) { |a| attr = a }
     assert_instance_of( String, attr )
 
     attr = nil
-    XAttr::llist(TEST_PATH) { |attr| }
+    XAttr::llist(TEST_PATH) { |a| attr = a }
     assert_instance_of( String, attr )
 
     assert_equal( XAttr::get(TEST_PATH, 'user.ruby'), 'rulez' )
